@@ -13,14 +13,15 @@
 # 0 is empty
 # 1 is black
 # 2 is white
-board = [[0,0,0,0]
-        ,[0,2,1,0]
-        ,[0,1,2,0]
-        ,[0,0,0,0]]
+_ = 0,
+B = 1,
+W = 2
+board = [[_,_,_,_]
+        ,[_,W,B,_]
+        ,[_,B,W,_]
+        ,[_,_,_,_]]
 max_col = 4
 max_row = 4
-
-
 
 
 def check_line(player: int, old_row: int, old_col:int, rel_row: int, rel_col: int):
@@ -81,8 +82,6 @@ def possible_moves(this_board, player: int):
         col_counter = 0
         for cols in rows:
             if cols != player and cols != 0:
-                
-
                 for r in range(-1, +2):
                     if row_counter + 2*r >= 0 and row_counter + 2*r < max_row:
                         for c in range(-1, +2):
@@ -110,7 +109,20 @@ def possible_moves(this_board, player: int):
 
     return moves_board
 
+def possible_moves_2(board, player: int):
+    moves = [[False,False,False,False]
+            ,[False,False,False,False]
+            ,[False,False,False,False]
+            ,[False,False,False,False]]
 
+    for i, line in enumerate(board):
+        for j, cell in enumerate(line):
+            
+
+    return moves
+
+possible_moves(board, 1)
+possible_moves_2(board, 1)
 
 counter = 0
 while True:
