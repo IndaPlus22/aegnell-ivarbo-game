@@ -6,6 +6,7 @@
 const e = 0;
 const B = 1;
 const W = 2;
+const p = 3;
 
 // The board is 6x6 and is represented as a 2D array
 // The first index is the row, the second is the column
@@ -19,6 +20,7 @@ let board = [[e, e, e, e, e, e],
 
 // Black goes first
 let player = B;
+let turn = 1;
 
 //// Game logic ////
 
@@ -39,7 +41,7 @@ function onBoard(row, col) {
 // Returns true if the given move is valid
 function isValidMove(row, col) {
     // Check if the space is blank
-    if (board[row][col] != e) {
+    if (board[row][col] != e && board[row][col] != p) {
         return false
     }
 
@@ -132,49 +134,120 @@ function makeMove(row, col) {
 
     // Switch players
     player = opposite(player)
+    turn++;   
+    updateBoard();
 }
 
 // Initializes canvas containing the board
-function draw() {
-    var canvas = document.getElementById("canvas");
-    var ctx = canvas.getContext("2d");
-
-    // Draw the board
-    ctx.fillStyle = "green";
-    ctx.fillRect(0, 0, 300, 300);
-
-    // Draw the pieces
-    for (var row = 0; row < 6; row++) {
-        for (var col = 0; col < 6; col++) {
-            if (board[row][col] == B) {
-                ctx.fillStyle = "black";
-                ctx.beginPath();
-                ctx.arc(25 + 50 * col, 25 + 50 * row, 20, 0, 2 * Math.PI);
-                ctx.fill();
-            } else if (board[row][col] == W) {
-                ctx.fillStyle = "white";
-                ctx.beginPath();
-                ctx.arc(25 + 50 * col, 25 + 50 * row, 20, 0, 2 * Math.PI);
-                ctx.fill();
-            }
+function makeBoard() {
+    // Create and place buttons representing each space on the board
+    turn = 1;
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            let button = document.createElement("button");
+            button.setAttribute("data-coordinates", [r,c]);
+            //button.classList.add("knapp");
+            button.addEventListener("click", testPosition)
+            document.getElementById("canvas").append(button);
         }
     }
+    
+    // Update the board
+    updateBoard();
 }
+
+
+//när man klickar på en plats
+function testPosition(event) {
+    let coordinates = event.target.getAttribute("data-coordinates")
+    let row = parseInt(coordinates[0]);
+    let col = parseInt(coordinates[2]);
+    
+    if (board[row][col] == p) {
+        makeMove(row, col);
+    }
+}
+
+
+
+// Update visual representation of the board
+function updateBoard() {
+    // Reset CSS theming of all markers
+    let buttons = document.getElementsByTagName("button");
+    for (let i = 0; i < (6*6); i++) {
+        buttons[i].className = "";
+    }
+    
+    // Update CSS theming of markers
+    let buttNum = 0;
+    for (r = 0; r < 6; r++) {
+        for (c = 0; c < 6; c++) {
+
+            // Possible spaces are cleared
+            if (board[r][c] == p) {
+                board[r][c] = e;
+            }
+            // Adds colored markers at each non-empty spaces
+            if (board[r][c] == e) {
+                buttons[buttNum].classList.add("empty");
+            } else if (board[r][c] == W) {
+                buttons[buttNum].classList.add("white");
+            } else if (board[r][c] == B) {
+                buttons[buttNum].classList.add("black");
+            }
+
+            
+
+            // Increment button position
+            buttNum++;
+        }
+    }
+
+    // Update current player and score
+    let playerIcon = "";
+    if (player == W) { playerIcon = "⚪" } else { playerIcon = "⚫" }
+    document.getElementById("player").innerHTML = "Player: " + playerIcon;
+    document.getElementById("black").innerHTML = "Black: " + score(B);
+    document.getElementById("white").innerHTML = "White: " + score(W);
+
+    // Generate new possible moves
+    buttNum = 0;
+    for (r = 0; r < 6; r++) {
+        for (c = 0; c < 6; c++) {
+            if (isValidMove(r,c)) {
+                board[r][c] = p;
+                buttons[buttNum].className = "";
+                buttons[buttNum].classList.add("possible");
+            }
+            buttNum++;;
+        }
+    }
+    if (gameOver()) {
+        alert(winner());
+    }
+}
+
+
+
+
+
 
 // Print the board
 function drawBoard() {
     for (var row = 0; row < 6; row++) {
-        var line = ""
+        var line = "";
         for (var col = 0; col < 6; col++) {
             if (board[row][col] == B) {
-                line += "B"
+                line += "B";
             } else if (board[row][col] == W) {
-                line += "W"
+                line += "W";
+            } else if (board[row][col] == e){
+                line += "e";
             } else {
-                line += "e"
+                line += "p";
             }
         }
-        console.log(line)
+        console.log(line);
     }
 }
 
@@ -184,13 +257,13 @@ function gameOver() {
     for (var row = 0; row < 6; row++) {
         for (var col = 0; col < 6; col++) {
             if (isValidMove(row, col)) {
-                return false
+                return false;
             }
         }
     }
 
     // No valid moves were found
-    return true
+    return true;
 }
 
 // Returns the score for the given color
@@ -199,24 +272,24 @@ function score(color) {
     for (var row = 0; row < 6; row++) {
         for (var col = 0; col < 6; col++) {
             if (board[row][col] == color) {
-                s++
+                s++;
             }
         }
     }
-    return s
+    return s;
 
 }
 
 // Returns the winner of the game
 function winner() {
-    var blackScore = score(B)
-    var whiteScore = score(W)
+    var blackScore = score(B);
+    var whiteScore = score(W);
     if (blackScore > whiteScore) {
-        return "Black wins!"
+        return "Black wins!";
     } else if (whiteScore > blackScore) {
-        return "White wins!"
+        return "White wins!";
     } else {
-        return "It's a tie!"
+        return "It's a tie!";
     }
 }
 
@@ -241,4 +314,4 @@ while (!gameOver()) {
 }
 
 // Print the winner
-console.log(winner())
+console.log(winner());
