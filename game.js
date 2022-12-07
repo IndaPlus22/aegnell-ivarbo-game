@@ -20,7 +20,6 @@ let board = [[e, e, e, e, e, e],
 
 // Black goes first
 let player = B;
-let turn = 1;
 
 //// Game logic ////
 
@@ -87,6 +86,7 @@ function checkDirection(row, col, drow, dcol) {
     return false
 }
 
+// Captures pieces in the given direction
 function capturePieces(row, col, drow, dcol) {
     // Check if the move is out of bounds
     if (!onBoard(row + drow, col + dcol)) {
@@ -163,7 +163,7 @@ function makeBoard() {
 }
 
 
-//när man klickar på en plats
+// Test if given position of move is valid
 function testPosition(event) {
     let coordinates = event.target.getAttribute("data-coordinates")
     let row = parseInt(coordinates[0]);
@@ -173,8 +173,6 @@ function testPosition(event) {
         makeMove(row, col);
     }
 }
-
-
 
 // Update visual representation of the board
 function updateBoard() {
@@ -193,6 +191,7 @@ function updateBoard() {
             if (board[r][c] == p) {
                 board[r][c] = e;
             }
+
             // Adds colored markers at each non-empty spaces
             if (board[r][c] == e) {
                 buttons[buttNum].classList.add("empty");
@@ -201,8 +200,6 @@ function updateBoard() {
             } else if (board[r][c] == B) {
                 buttons[buttNum].classList.add("black");
             }
-
-            
 
             // Increment button position
             buttNum++;
@@ -227,30 +224,6 @@ function updateBoard() {
             }
             buttNum++;;
         }
-    }
-}
-
-
-
-
-
-
-// Print the board
-function drawBoard() {
-    for (var row = 0; row < 6; row++) {
-        var line = "";
-        for (var col = 0; col < 6; col++) {
-            if (board[row][col] == B) {
-                line += "B";
-            } else if (board[row][col] == W) {
-                line += "W";
-            } else if (board[row][col] == e){
-                line += "e";
-            } else {
-                line += "p";
-            }
-        }
-        console.log(line);
     }
 }
 
