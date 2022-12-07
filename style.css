@@ -38,7 +38,7 @@ button {
 
 .possible:hover{
     background-color: rgb(94, 138, 94);
-    border-color: black;
+    border-color: #212121;
     border-width: 5px;
 }
 
@@ -67,15 +67,17 @@ button {
     height: 80px;
     margin-top:110px;
     margin-left: 50px;
+
+    position: absolute;
     display: flex;
     justify-content: center;
     align-items: center;
-    position: absolute;
-    background-color: black;
-    color: white;
-}
+    
+    background-color: #212121;
+    color: #F7F7F7;
 
-#gameOverTrue {
-    z-index: 100;
+    border-radius: 10px;
+    border-color: white;
+    border-width: 10px;
 }
 

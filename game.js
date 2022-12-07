@@ -138,7 +138,9 @@ function makeMove(row, col) {
     updateBoard();
     
     if (gameOver()) {
-        alert(winner());
+        let gameOver = document.getElementById("gameOver")
+        gameOver.innerHTML = winner();
+        gameOver.style.zIndex = "100";
     }
 }
 
