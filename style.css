@@ -1,8 +1,14 @@
 body {
     display: flex;
     justify-content: center;
+    align-items: center;
     padding-top: 20vh;
     background-color: #212121;
+}
+
+main {
+    display: flex;
+    justify-content: center;
 }
 
 #canvas {
@@ -55,4 +61,21 @@ button {
     margin-top: 10px;
 }
 
+#gameOver {
+    z-index: -1;
+    width: 200px;
+    height: 80px;
+    margin-top:110px;
+    margin-left: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: absolute;
+    background-color: black;
+    color: white;
+}
+
+#gameOverTrue {
+    z-index: 100;
+}
 

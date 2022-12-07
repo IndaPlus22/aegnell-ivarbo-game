@@ -136,6 +136,10 @@ function makeMove(row, col) {
     player = opposite(player)
     turn++;   
     updateBoard();
+    
+    if (gameOver()) {
+        alert(winner());
+    }
 }
 
 // Initializes canvas containing the board
@@ -221,9 +225,6 @@ function updateBoard() {
             }
             buttNum++;;
         }
-    }
-    if (gameOver()) {
-        alert(winner());
     }
 }
 
