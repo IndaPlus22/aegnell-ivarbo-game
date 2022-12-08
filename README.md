@@ -2,6 +2,7 @@
 gamin
 
 ## Othello
+Vi gjorde Othello på en hemisda med javascript
 
 ### da rulezz
 Spelare måste lägga en markör så att minst en utav motståndarens markörer hamnar mellan spelarens nyss lagda markör och en av spelarens markörer som redan ligger på brädet. När man gör detta byter motståndarens markörer färg och blir första spelarens egna markörer.
