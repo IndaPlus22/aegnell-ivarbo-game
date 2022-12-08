@@ -1,11 +1,9 @@
-# aegnell-ivarbo-game
-gamin
+# Othello
+En variant av Othello (eller Reversi) med ett 6x6-bräde, byggd med HTML + CSS + Javascript.
 
-## Othello
-Vi gjorde Othello på en hemisda med javascript
+Spelbrädet representeras av ett rutnät av HTML-element. De svarta resp. vita cirklarna representerar markörer. De gråa cirklarna representerar giltiga drag. Spelare väljer drag genom att klicka på en av dessa gråmarkerade rutor, men det går även att välja drag manuellt genom konsolen. Nuvarande spelare och respektive spelares poäng representeras vid sidan av brädet.
 
-### da rulezz
-Spelare måste lägga en markör så att minst en utav motståndarens markörer hamnar mellan spelarens nyss lagda markör och en av spelarens markörer som redan ligger på brädet. När man gör detta byter motståndarens markörer färg och blir första spelarens egna markörer.
+![DjguQ5TmdL](https://user-images.githubusercontent.com/59237624/206496836-26593f75-be43-4773-9e80-8a4219b057da.png)
 
-Man vinner genom att ha flest markörer på brädet när någon spelare inte kan lägga ett giltigt drag, antingen för att alla platser är upptagna eller för att den spelaren inte kan ta några av motståndarens markörer. 
-
+## Regler
+Reglerna är identiska till "vanliga" Othello. Ett giltigt drag är ett som lägger en markör på en tom ruta och resulterar i att minst en av motståndarens markörer hamnar mellan den nyligen lagda markören och en av spelarens existerande markörer, såväl vertikalt och horisontellt som diagonalt. De av motståndarens markörer som hamnar mellan blir spelarens markörer, och byter färg. Spelet slutar när det inte finns några giltiga drag kvar, och spelaren med flest poäng vinner. Spelarens poäng motsvarar antalet markörer på brädet av spelarens färg.
