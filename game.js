@@ -13,8 +13,8 @@ const p = 3;
 // The board is initialized with the starting pieces
 let board = [[e, e, e, e, e, e],
              [e, e, e, e, e, e],
-             [e, e, B, W, e, e],
              [e, e, W, B, e, e],
+             [e, e, B, W, e, e],
              [e, e, e, e, e, e],
              [e, e, e, e, e, e]];
 
