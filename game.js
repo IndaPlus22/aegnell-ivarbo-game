@@ -289,5 +289,14 @@ while (!gameOver()) {
     }
 }
 
-// Print the winner
-console.log(winner());
+
+
+
+
+function adamsClick() {
+    console.log("adam")
+}
+
+function ivarsClick() {
+    console.log("ivar")
+}
