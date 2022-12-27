@@ -4,6 +4,7 @@ body {
     align-items: center;
     padding-top: 20vh;
     background-color: #212121;
+    flex-direction: column;
 }
 
 main {
@@ -18,6 +19,24 @@ main {
     height: 300px;
     background-color: green;
     border-radius: 20px 0px 0px 20px;
+}
+
+#AI {
+    display: flex;
+}
+
+#AI p {
+    font-family: 'Lato', 'Roboto', sans-serif;
+    background-color: #F7F7F7;
+    color: #212121;
+    padding: 20px 40px;
+    margin: 20px;
+    border-radius: 20px;
+}
+
+#AI p:hover {
+    cursor:pointer;
+    background-color: #d7d7d7;
 }
 
 button {
