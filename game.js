@@ -20,6 +20,7 @@ let board = [[e, e, e, e, e, e],
 
 // Black goes first
 let player = B;
+let cpu = opposite(player);
 
 //// Game logic ////
 
@@ -290,12 +291,168 @@ while (!gameOver()) {
 }
 
 
+function logBoard(b) {
+    for (let r = 0; r < 6; r++) {
+        console.log(b[r][0] + ", " + b[r][1] + ", " + b[r][2] + ", " + b[r][3] + ", " + b[r][4] + ", " + b[r][5] + "     " + r)
+    }
+    console.log(".")
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Adams minmax
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
 
 
 function adamsClick() {
-    console.log("adam")
+
+
+    let depth = 3;
+
+
+    let originalBoard = structuredClone(board);
+    cpu = player;
+    let possibleScore = [];
+    let boardDepth = []; //behövs?
+    let checkGameOver = true;
+
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            possibleScore[(r*6 + c)] = -1;
+            board = structuredClone(originalBoard);
+            if (board[r][c] == p) {
+                checkGameOver = false;
+                possibleScore[(r*6 + c)] = 0;
+                adamsMakeMove(r,c);
+                board = adamsUpdateBoard(board);
+                
+                
+                boardDepth[depth] = structuredClone(board);
+                possibleScore[(r*6 + c)] = adamsMinmax(boardDepth, depth, true);
+                board = structuredClone(originalBoard);
+            }
+        }
+    }
+    if (!checkGameOver) {
+        let max = -1;
+        let maxPosition = 0;
+        for (let i = 0; i < 36; i++) {
+            if (max < possibleScore[i]) {
+                max = possibleScore[i];
+                maxPosition = i;
+            }
+        }
+
+        let row = Math.floor(maxPosition / 6);
+        let col = maxPosition % 6;
+
+
+        board = structuredClone(originalBoard);
+        player = cpu;
+
+    
+        for (let i = 0; i < 6; i++) {
+            console.log(possibleScore[i*6] + ", " + possibleScore[i*6 + 1] + ", " + possibleScore[i*6 + 2] + ", " + possibleScore[i*6 + 3] + ", " + possibleScore[i*6 + 4] + ", " + possibleScore[i*6 + 5] + "    " + i);
+        }
+        console.log(possibleScore[maxPosition]);
+        console.log(row + ", " + col)
+        makeMove(row, col);
+    }
 }
+
+function adamsMinmax(boardDepth, depth, maximize) {
+    board = structuredClone(boardDepth[depth]);
+    if (depth == 0) {
+        return score(cpu);
+    } 
+    if (maximize) {
+        value = score(cpu);
+        for (let r = 0; r < 6; r++) {
+            for (let c = 0; c < 6; c++) {
+                if (board[r][c] == p) {
+                    player = cpu;
+                    adamsMakeMove(r,c);
+                    board = adamsUpdateBoard(board);
+
+                    boardDepth[depth-1] = structuredClone(board);
+
+                    value = max(value, adamsMinmax(boardDepth, depth-1, false));
+
+                    board = structuredClone(boardDepth[depth]);
+                }
+            }
+        }
+    } else {
+        value = score(cpu);
+        for (let r = 0; r < 6; r++) {
+            for (let c = 0; c < 6; c++) {
+                if (board[r][c] == p) {
+                    player = opposite(cpu);
+                    adamsMakeMove(r,c);
+                    board = adamsUpdateBoard(board);
+
+                    boardDepth[depth-1] = structuredClone(board);
+
+                    value = min(value, adamsMinmax(boardDepth, depth-1, true));
+
+                    board = structuredClone(boardDepth[depth]);
+
+                }
+            }
+        }
+    }
+    return value;
+}
+
+function adamsUpdateBoard(board) {
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            if (board[r][c] == p) {
+                board[r][c] = e;
+            }
+            if (board[r][c] == e && isValidMove(r,c)) {
+                board[r][c] = p;
+            }
+        }
+    }
+    return board;
+}
+
+function adamsMakeMove(row, col) {
+    // Place the piece
+    board[row][col] = player;
+
+    // Capture any pieces
+    for (var drow = -1; drow <= 1; drow++) {
+        for (var dcol = -1; dcol <= 1; dcol++) {
+            capturePieces(row, col, drow, dcol)
+        }
+    }
+}
+
+
+function max(a,b){
+    if (a>b) {return a;}
+    else {return b;}
+}
+
+function min(a,b){
+    if (a<b) {return a;}
+    else {return b;}
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+//      Ivars minmax
+//
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 
 function ivarsClick() {
     console.log("ivar")
