@@ -449,8 +449,6 @@ function adamsMakeMove(row, col) {
 }
 
 
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////
@@ -461,4 +459,83 @@ function adamsMakeMove(row, col) {
 
 function ivarsClick() {
     console.log("ivar")
+}
+
+function ivarsReturnValidMoves() {
+    let validMoves = [];
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            if (isValidMove(r, c)) {
+                validMoves.append((r, c));
+            }
+        }
+    }
+
+    return validMoves;
+}
+
+function ivarsSimulate() {
+    let simulatedWins = 0;
+    let simulatedGames = 0;
+    
+    while (!gameOver()) {
+        const validMoves = ivarsReturnValidMoves();
+        const moveIndex = Math.floor(Math.random() * length(validMoves));
+        const nextMove = validMoves[moveIndex];
+        // Perform move
+        // Get next board state
+    }
+
+    simulatedWins++;
+    simulatedGames++;
+}
+
+// Monte Carlo tree search with heuristic rules
+function ivarsMonteCarlo() {
+    // Selection
+    const explorationFactor = Math.SQRT2;
+    let maxUcb = {'r': 0, 'c': 0, 'ucb': 0};
+
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            if (isValidMove(r, c)) {
+                // Calculate upper confidence bound weighted with exploration factor
+                let ucb = simulatedWins / simulatedGames +
+                          explorationFactor * Math.sqrt(Math.log(totalSimulatedGames) / simulatedGames);
+
+                if (ucb > maxUcb.ucb) {
+                    maxUcb.r, maxUcb.c = r, c;
+                    maxUcb.ucb = ucb;
+                }
+            }
+        }
+    }
+
+    // Expansion
+
+    // Simulation
+
+}
+
+function ivarsUpdateBoard(board) {
+    for (let r = 0; r < 6; r++) {
+        for (let c = 0; c < 6; c++) {
+            if (board[r][c] == p) {
+                board[r][c] = e;
+            }
+            if (board[r][c] == e && isValidMove(r,c)) {
+                board[r][c] = p;
+            }
+        }
+    }
+    return board;
+}
+
+function ivarsMakeMove(row, col) {
+    board[row][col] = player;
+    for (var drow = -1; drow <= 1; drow++) {
+        for (var dcol = -1; dcol <= 1; dcol++) {
+            capturePieces(row, col, drow, dcol);
+        }
+    }
 }
