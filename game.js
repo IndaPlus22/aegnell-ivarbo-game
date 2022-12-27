@@ -310,7 +310,7 @@ function logBoard(b) {
 
 function adamsClick() {
 
-
+    //depth of minmax
     let depth = 3;
 
 
@@ -323,72 +323,90 @@ function adamsClick() {
         for (let c = 0; c < 6; c++) {
             possibleScore[(r*6 + c)] = -1;
             if (board[r][c] == p) {
+                //if there is possible moves the computer has to make one
                 checkGameOver = false;
                 possibleScore[(r*6 + c)] = 0;
+
+                //test a move
                 adamsMakeMove(r,c);
                 board = adamsUpdateBoard(board);
                 
-                
+                //see the score of all possible moves on the board
                 possibleScore[(r*6 + c)] = adamsMinmax(depth, true);
                 board = structuredClone(originalBoard);
             }
         }
     }
-    
+    //if there were possible moves
     if (!checkGameOver) {
         let max = -1;
         let maxPosition = 0;
         for (let i = 0; i < 36; i++) {
+            //max is the highest possible score
             if (max < possibleScore[i]) {
                 max = possibleScore[i];
+                //maxPosition is the position of the highest possible score
                 maxPosition = i;
             }
         }
 
+        //makes the position to row and column coordinates
         let row = Math.floor(maxPosition / 6);
         let col = maxPosition % 6;
 
+        //make a move based on the highest possible score
         board = structuredClone(originalBoard);
         player = cpu;
         makeMove(row, col);
     }
 }
 
+//minmax function
 function adamsMinmax(depth, maximize) {
-    
+    //if depth = 0 then just return the score
     if (depth == 0) {
         return score(cpu);
     } 
+    // if the goal is to maximize score
     if (maximize) {
         value = score(cpu);
         for (let r = 0; r < 6; r++) {
             for (let c = 0; c < 6; c++) {
+                //tests every possible placement
                 if (board[r][c] == p) {
                     let currBoard = structuredClone(board);
 
+                    //test a move
                     player = cpu;
                     adamsMakeMove(r,c);
                     board = adamsUpdateBoard(board);
 
-                    value = max(value, adamsMinmax(depth-1, false));
+                    //see the possible value of this move
+                    value = adamsMinmax(depth-1, false);
 
+                    //reset the board to before the computer made a possible move
                     board = structuredClone(currBoard);
                 }
             }
         }
+    //if goal is to minimize score
     } else {
         value = score(cpu);
         for (let r = 0; r < 6; r++) {
             for (let c = 0; c < 6; c++) {
+                //tests every possible placement
                 if (board[r][c] == p) {
                     let currBoard = structuredClone(board);
 
+                    //test a move
                     player = opposite(cpu);
                     adamsMakeMove(r,c);
                     board = adamsUpdateBoard(board);
 
-                    value = min(value, adamsMinmax(depth-1, true));
+                    //see the possible value of this move
+                    value = adamsMinmax(depth-1, true);
 
+                    //reset the board to before the computer made a possible move
                     board = structuredClone(currBoard);
 
                 }
@@ -398,12 +416,15 @@ function adamsMinmax(depth, maximize) {
     return value;
 }
 
+//updates the possible places on the board
 function adamsUpdateBoard(board) {
     for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
+            //resets possible moves
             if (board[r][c] == p) {
                 board[r][c] = e;
             }
+            //make new possible moves
             if (board[r][c] == e && isValidMove(r,c)) {
                 board[r][c] = p;
             }
@@ -412,6 +433,8 @@ function adamsUpdateBoard(board) {
     return board;
 }
 
+
+//makes a move without telling the game it is the computers move
 function adamsMakeMove(row, col) {
     // Place the piece
     board[row][col] = player;
@@ -425,15 +448,6 @@ function adamsMakeMove(row, col) {
 }
 
 
-function max(a,b){
-    if (a>b) {return a;}
-    else {return b;}
-}
-
-function min(a,b){
-    if (a<b) {return a;}
-    else {return b;}
-}
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
