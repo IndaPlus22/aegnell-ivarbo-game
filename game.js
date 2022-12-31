@@ -365,7 +365,7 @@ function adamsMinmax(depth, maximize) {
     } 
     // if the goal is to maximize score
     if (maximize) {
-        value = score(board, cpu);
+        value = -1;
         for (let r = 0; r < 6; r++) {
             for (let c = 0; c < 6; c++) {
                 //tests every possible placement
@@ -378,7 +378,7 @@ function adamsMinmax(depth, maximize) {
                     board = adamsUpdateBoard(board);
 
                     //see the possible value of this move
-                    value = adamsMinmax(depth-1, false);
+                    value = Math.max(value, adamsMinmax(depth-1, false));
 
                     //reset the board to before the computer made a possible move
                     board = structuredClone(currBoard);
@@ -387,7 +387,7 @@ function adamsMinmax(depth, maximize) {
         }
     //if goal is to minimize score
     } else {
-        value = score(board, cpu);
+        value = 37;
         for (let r = 0; r < 6; r++) {
             for (let c = 0; c < 6; c++) {
                 //tests every possible placement
@@ -400,7 +400,7 @@ function adamsMinmax(depth, maximize) {
                     board = adamsUpdateBoard(board);
 
                     //see the possible value of this move
-                    value = adamsMinmax(depth-1, true);
+                    value = Math.min(value, adamsMinmax(depth-1, true));
 
                     //reset the board to before the computer made a possible move
                     board = structuredClone(currBoard);
@@ -409,6 +409,8 @@ function adamsMinmax(depth, maximize) {
             }
         }
     }
+
+    if (value == -1 || value == 37) {value = score(cpu);}
     return value;
 }
 
