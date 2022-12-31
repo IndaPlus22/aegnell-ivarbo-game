@@ -27,9 +27,9 @@ let cpu = opposite(player);
 // Returns the opposite color
 function opposite(color) {
     if (color == B) {
-        return W
+        return W;
     } else {
-        return B
+        return B;
     }
 }
 
@@ -39,34 +39,34 @@ function onBoard(row, col) {
 }
 
 // Returns true if the given move is valid
-function isValidMove(row, col) {
+function isValidMove(currentBoard, row, col) {
     // Check if the space is blank
-    if (board[row][col] != e && board[row][col] != p) {
-        return false
+    if (currentBoard[row][col] != e && currentBoard[row][col] != p) {
+        return false;
     }
 
     // Check if the move captures any pieces
     for (var drow = -1; drow <= 1; drow++) {
         for (var dcol = -1; dcol <= 1; dcol++) {
-            if (checkDirection(row, col, drow, dcol)) {
-                return true
+            if (checkDirection(currentBoard, row, col, drow, dcol)) {
+                return true;
             }
         }
     }
 
     // No pieces were captured
-    return false
+    return false;
 }
 
 // Checks if the given move in the given direction captures any pieces
-function checkDirection(row, col, drow, dcol) {
+function checkDirection(currentBoard, row, col, drow, dcol) {
     // Check if the move is out of bounds
     if (!onBoard(row + drow, col + dcol)) {
         return false
     }
 
     // Check if the next space is the opposite color
-    if (board[row + drow][col + dcol] != opposite(player)) {
+    if (currentBoard[row + drow][col + dcol] != opposite(player)) {
         return false
     }
 
@@ -76,9 +76,9 @@ function checkDirection(row, col, drow, dcol) {
     while (onBoard(r + drow, c + dcol)) {
         r += drow
         c += dcol
-        if (board[r][c] == player) {
+        if (currentBoard[r][c] == player) {
             return true
-        } else if (board[r][c] == e) {
+        } else if (currentBoard[r][c] == e) {
             return false
         }
     }
@@ -88,14 +88,14 @@ function checkDirection(row, col, drow, dcol) {
 }
 
 // Captures pieces in the given direction
-function capturePieces(row, col, drow, dcol) {
+function capturePieces(currentBoard, row, col, drow, dcol) {
     // Check if the move is out of bounds
     if (!onBoard(row + drow, col + dcol)) {
         return
     }
 
     // Check if the next space is the opposite color
-    if (board[row + drow][col + dcol] != opposite(player)) {
+    if (currentBoard[row + drow][col + dcol] != opposite(player)) {
         return
     }
 
@@ -105,42 +105,42 @@ function capturePieces(row, col, drow, dcol) {
     while (onBoard(r + drow, c + dcol)) {
         r += drow
         c += dcol
-        if (board[r][c] == player) {
+        if (currentBoard[r][c] == player) {
             // Capture the pieces
             r = row + drow
             c = col + dcol
-            while (board[r][c] != player) {
-                board[r][c] = player
+            while (currentBoard[r][c] != player) {
+                currentBoard[r][c] = player
                 r += drow
                 c += dcol
             }
             return
-        } else if (board[r][c] == e) {
+        } else if (currentBoard[r][c] == e) {
             return
         }
     }
 }
 
 // Makes the given move and captures any pieces
-function makeMove(row, col) {
+function makeMove(currentBoard, row, col) {
     // Place the piece
-    board[row][col] = player
+    currentBoard[row][col] = player
 
     // Capture any pieces
     for (var drow = -1; drow <= 1; drow++) {
         for (var dcol = -1; dcol <= 1; dcol++) {
-            capturePieces(row, col, drow, dcol)
+            capturePieces(currentBoard, row, col, drow, dcol)
         }
     }
 
     // Switch players
     player = opposite(player)
     turn++;   
-    updateBoard();
+    updateBoard(currentBoard);
     
-    if (gameOver()) {
+    if (gameOver(currentBoard)) {
         let gameOver = document.getElementById("gameOver")
-        gameOver.innerHTML = winner();
+        gameOver.innerHTML = winner(currentBoard);
         gameOver.style.zIndex = "100";
     }
 }
@@ -154,29 +154,28 @@ function makeBoard() {
             let button = document.createElement("button");
             button.setAttribute("data-coordinates", [r,c]);
             //button.classList.add("knapp");
-            button.addEventListener("click", testPosition)
+            button.addEventListener("click", (event => testPosition(board, event)));
             document.getElementById("canvas").append(button);
         }
     }
     
     // Update the board
-    updateBoard();
+    updateBoard(board);
 }
 
-
 // Test if given position of move is valid
-function testPosition(event) {
+function testPosition(currentBoard, event) {
     let coordinates = event.target.getAttribute("data-coordinates")
     let row = parseInt(coordinates[0]);
     let col = parseInt(coordinates[2]);
     
-    if (board[row][col] == p) {
-        makeMove(row, col);
+    if (currentBoard[row][col] == p) {
+        makeMove(currentBoard, row, col);
     }
 }
 
 // Update visual representation of the board
-function updateBoard() {
+function updateBoard(currentBoard) {
     // Reset CSS theming of all markers
     let buttons = document.getElementsByTagName("button");
     for (let i = 0; i < (6*6); i++) {
@@ -189,16 +188,16 @@ function updateBoard() {
         for (c = 0; c < 6; c++) {
 
             // Possible spaces are cleared
-            if (board[r][c] == p) {
-                board[r][c] = e;
+            if (currentBoard[r][c] == p) {
+                currentBoard[r][c] = e;
             }
 
             // Adds colored markers at each non-empty spaces
-            if (board[r][c] == e) {
+            if (currentBoard[r][c] == e) {
                 buttons[buttNum].classList.add("empty");
-            } else if (board[r][c] == W) {
+            } else if (currentBoard[r][c] == W) {
                 buttons[buttNum].classList.add("white");
-            } else if (board[r][c] == B) {
+            } else if (currentBoard[r][c] == B) {
                 buttons[buttNum].classList.add("black");
             }
 
@@ -211,15 +210,15 @@ function updateBoard() {
     let playerIcon = "";
     if (player == W) { playerIcon = "⚪" } else { playerIcon = "⚫" }
     document.getElementById("player").innerHTML = "Player: " + playerIcon;
-    document.getElementById("black").innerHTML = "Black: " + score(B);
-    document.getElementById("white").innerHTML = "White: " + score(W);
+    document.getElementById("black").innerHTML = "Black: " + score(currentBoard, B);
+    document.getElementById("white").innerHTML = "White: " + score(currentBoard, W);
 
     // Generate new possible moves
     buttNum = 0;
     for (r = 0; r < 6; r++) {
         for (c = 0; c < 6; c++) {
-            if (isValidMove(r,c)) {
-                board[r][c] = p;
+            if (isValidMove(currentBoard, r, c)) { // possibly incorrect?
+                currentBoard[r][c] = p;
                 buttons[buttNum].className = "";
                 buttons[buttNum].classList.add("possible");
             }
@@ -229,11 +228,11 @@ function updateBoard() {
 }
 
 // Returns true if the game is over
-function gameOver() {
+function gameOver(currentBoard) {
     // Check if there are any valid moves
     for (var row = 0; row < 6; row++) {
         for (var col = 0; col < 6; col++) {
-            if (isValidMove(row, col)) {
+            if (isValidMove(currentBoard, row, col)) { // possibly incorrect?
                 return false;
             }
         }
@@ -244,11 +243,11 @@ function gameOver() {
 }
 
 // Returns the score for the given color
-function score(color) {
+function score(currentBoard, color) {
     var s = 0
     for (var row = 0; row < 6; row++) {
         for (var col = 0; col < 6; col++) {
-            if (board[row][col] == color) {
+            if (currentBoard[row][col] == color) {
                 s++;
             }
         }
@@ -258,9 +257,9 @@ function score(color) {
 }
 
 // Returns the winner of the game
-function winner() {
-    var blackScore = score(B);
-    var whiteScore = score(W);
+function winner(currentBoard) {
+    var blackScore = score(currentBoard, B);
+    var whiteScore = score(currentBoard, W);
     if (blackScore > whiteScore) {
         return "Black wins!";
     } else if (whiteScore > blackScore) {
@@ -272,34 +271,31 @@ function winner() {
 
 //// Main program ////
 
-// Handle input
-const readlineSync = require('readline-sync');
+// // Handle input
+// const readlineSync = require('readline-sync');
 
-// Play the game
-printBoard()
-while (!gameOver()) {
-    // Get the player's move
-    let answer = readlineSync.question("Enter the row and column of your move: ");
-    var row = parseInt(answer[0]);
-    var col = parseInt(answer[2]);
-    if (isValidMove(row, col)) {
-        makeMove(row, col);
-        printBoard();
-    } else {
-        console.log("Invalid move!");
-    }
-}
+// // Play the game
+// printBoard()
+// while (!gameOver()) {
+//     // Get the player's move
+//     let answer = readlineSync.question("Enter the row and column of your move: ");
+//     var row = parseInt(answer[0]);
+//     var col = parseInt(answer[2]);
+//     if (isValidMove(currentBoard, row, col)) { // possibly incorrect?
+//         makeMove(currentBoard, row, col);
+//         printBoard(currentBoard);
+//     } else {
+//         console.log("Invalid move!");
+//     }
+// }
 
 
-function logBoard(b) {
+function logBoard(currentBoard) {
     for (let r = 0; r < 6; r++) {
         console.log(b[r][0] + ", " + b[r][1] + ", " + b[r][2] + ", " + b[r][3] + ", " + b[r][4] + ", " + b[r][5] + "     " + r)
     }
     console.log(".")
 }
-
-
-
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,7 +306,6 @@ function logBoard(b) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function adamsClick() {
-
     //depth of minmax
     let depth = 4;
 
@@ -358,7 +353,7 @@ function adamsClick() {
         //make a move based on the highest possible score
         board = structuredClone(originalBoard);
         player = cpu;
-        makeMove(row, col);
+        makeMove(board, row, col);
     }
 }
 
@@ -366,11 +361,11 @@ function adamsClick() {
 function adamsMinmax(depth, maximize) {
     //if depth = 0 then just return the score
     if (depth == 0) {
-        return score(cpu);
+        return score(board, cpu);
     } 
     // if the goal is to maximize score
     if (maximize) {
-        value = score(cpu);
+        value = score(board, cpu);
         for (let r = 0; r < 6; r++) {
             for (let c = 0; c < 6; c++) {
                 //tests every possible placement
@@ -392,7 +387,7 @@ function adamsMinmax(depth, maximize) {
         }
     //if goal is to minimize score
     } else {
-        value = score(cpu);
+        value = score(board, cpu);
         for (let r = 0; r < 6; r++) {
             for (let c = 0; c < 6; c++) {
                 //tests every possible placement
@@ -426,7 +421,7 @@ function adamsUpdateBoard(board) {
                 board[r][c] = e;
             }
             //make new possible moves
-            if (board[r][c] == e && isValidMove(r,c)) {
+            if (board[r][c] == e && isValidMove(board, r, c)) {
                 board[r][c] = p;
             }
         }
@@ -443,7 +438,7 @@ function adamsMakeMove(row, col) {
     // Capture any pieces
     for (var drow = -1; drow <= 1; drow++) {
         for (var dcol = -1; dcol <= 1; dcol++) {
-            capturePieces(row, col, drow, dcol)
+            capturePieces(board, row, col, drow, dcol)
         }
     }
 }
@@ -461,11 +456,11 @@ function ivarsClick() {
     console.log("ivar")
 }
 
-function ivarsReturnValidMoves() {
+function ivarsReturnValidMoves(currentBoard) {
     let validMoves = [];
     for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
-            if (isValidMove(r, c)) {
+            if (isValidMove(currentBoard, r, c)) {
                 validMoves.append((r, c));
             }
         }
@@ -474,31 +469,35 @@ function ivarsReturnValidMoves() {
     return validMoves;
 }
 
-function ivarsSimulate() {
+// Simulates game from starting board n times, tallies statistics
+function ivarsSimulate(currentBoard, n) {
+    let currentBoardCopy;
     let simulatedWins = 0;
     let simulatedGames = 0;
     
-    while (!gameOver()) {
-        const validMoves = ivarsReturnValidMoves();
-        const moveIndex = Math.floor(Math.random() * length(validMoves));
-        const nextMove = validMoves[moveIndex];
-        // Perform move
-        // Get next board state
+    for (let i = 0; i < n; i++) {
+        while (!gameOver()) {
+            const validMoves = ivarsReturnValidMoves();
+            const moveIndex = Math.floor(Math.random() * length(validMoves));
+            const nextMove = validMoves[moveIndex];
+            currentBoard = ivarsMakeMove(currentBoard, nextMove[0], nextMove[1]);
+            // Get next board state
+        }
+    
+        simulatedWins++;
+        simulatedGames++;
     }
-
-    simulatedWins++;
-    simulatedGames++;
 }
 
 // Monte Carlo tree search with heuristic rules
-function ivarsMonteCarlo() {
+function ivarsMonteCarlo(currentBoard) {
     // Selection
     const explorationFactor = Math.SQRT2;
     let maxUcb = {'r': 0, 'c': 0, 'ucb': 0};
 
     for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
-            if (isValidMove(r, c)) {
+            if (isValidMove(currentBoard, r, c)) {
                 // Calculate upper confidence bound weighted with exploration factor
                 let ucb = simulatedWins / simulatedGames +
                           explorationFactor * Math.sqrt(Math.log(totalSimulatedGames) / simulatedGames);
@@ -523,7 +522,7 @@ function ivarsUpdateBoard(board) {
             if (board[r][c] == p) {
                 board[r][c] = e;
             }
-            if (board[r][c] == e && isValidMove(r,c)) {
+            if (board[r][c] == e && isValidMove(currentBoard, r,c)) {
                 board[r][c] = p;
             }
         }
