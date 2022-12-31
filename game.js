@@ -410,7 +410,7 @@ function adamsMinmax(depth, maximize) {
         }
     }
 
-    if (value == -1 || value == 37) {value = score(cpu);}
+    if (value == -1 || value == 37) {value = score(board, cpu);}
     return value;
 }
 
@@ -455,7 +455,7 @@ function adamsMakeMove(row, col) {
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 function ivarsClick() {
-    console.log("ivar")
+    ivarsMonteCarlo(board, player);
 }
 
 function ivarsReturnValidMoves(currentBoard) {
@@ -463,7 +463,7 @@ function ivarsReturnValidMoves(currentBoard) {
     for (let r = 0; r < 6; r++) {
         for (let c = 0; c < 6; c++) {
             if (isValidMove(currentBoard, r, c)) {
-                validMoves.append((r, c));
+                validMoves.push([r, c]);
             }
         }
     }
@@ -472,50 +472,42 @@ function ivarsReturnValidMoves(currentBoard) {
 }
 
 // Simulates game from starting board n times, tallies statistics
-function ivarsSimulate(currentBoard, n) {
-    let currentBoardCopy;
+function ivarsSimulate(currentBoard, player, n) {
     let simulatedWins = 0;
     let simulatedGames = 0;
     
     for (let i = 0; i < n; i++) {
-        while (!gameOver()) {
-            const validMoves = ivarsReturnValidMoves();
+        while (!gameOver(currentBoard)) {
+            const validMoves = ivarsReturnValidMoves(currentBoard);
             const moveIndex = Math.floor(Math.random() * length(validMoves));
             const nextMove = validMoves[moveIndex];
             currentBoard = ivarsMakeMove(currentBoard, nextMove[0], nextMove[1]);
-            // Get next board state
         }
-    
-        simulatedWins++;
+        
         simulatedGames++;
+        if (score(currentBoard, player) > score(currentBoard, opposite(player))) {
+            simulatedWins++;
+        }
     }
+
+    return [simulatedWins, simulatedGames];
 }
 
-// Monte Carlo tree search with heuristic rules
-function ivarsMonteCarlo(currentBoard) {
-    // Selection
-    const explorationFactor = Math.SQRT2;
-    let maxUcb = {'r': 0, 'c': 0, 'ucb': 0};
+// Pure Monte Carlo tree search
+function ivarsMonteCarlo(currentBoard, player) {
+    let nextMove = {"r": 0, "c": 0, "wr": 0};
 
-    for (let r = 0; r < 6; r++) {
-        for (let c = 0; c < 6; c++) {
-            if (isValidMove(currentBoard, r, c)) {
-                // Calculate upper confidence bound weighted with exploration factor
-                let ucb = simulatedWins / simulatedGames +
-                          explorationFactor * Math.sqrt(Math.log(totalSimulatedGames) / simulatedGames);
+    ivarsReturnValidMoves(currentBoard).forEach(move => {
+        const nextBoard = makeMove(currentBoard, move[0], move[1]);
+        const [simulatedWins, simulatedGames] = ivarsSimulate(nextBoard, player, 100);
+        const wr = simulatedWins / simulatedGames;
 
-                if (ucb > maxUcb.ucb) {
-                    maxUcb.r, maxUcb.c = r, c;
-                    maxUcb.ucb = ucb;
-                }
-            }
+        if (wr > nextMove.wr) {
+            nextMove.r, nextMove.c, nextMove.wr = move.r, move.c, wr;
         }
-    }
+    });
 
-    // Expansion
-
-    // Simulation
-
+    ivarsMakeMove(currentBoard, nextMove.r, nextMove.c);
 }
 
 function ivarsUpdateBoard(board) {
@@ -532,11 +524,11 @@ function ivarsUpdateBoard(board) {
     return board;
 }
 
-function ivarsMakeMove(row, col) {
-    board[row][col] = player;
+function ivarsMakeMove(currentBoard, row, col) {
+    currentBoard[row][col] = player;
     for (var drow = -1; drow <= 1; drow++) {
         for (var dcol = -1; dcol <= 1; dcol++) {
-            capturePieces(row, col, drow, dcol);
+            capturePieces(currentBoard, row, col, drow, dcol);
         }
     }
 }
