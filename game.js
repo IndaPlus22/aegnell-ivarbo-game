@@ -310,7 +310,6 @@ function adamsClick() {
     let depth = 4;
 
 
-    let originalBoard = structuredClone(board);
     cpu = player;
     let possibleScore = [];
     let checkGameOver = true;
@@ -319,17 +318,18 @@ function adamsClick() {
         for (let c = 0; c < 6; c++) {
             possibleScore[(r*6 + c)] = -1;
             if (board[r][c] == p) {
+                let currBoard = structuredClone(board);
+
                 //if there is possible moves the computer has to make one
                 checkGameOver = false;
                 possibleScore[(r*6 + c)] = 0;
 
                 //test a move
-                adamsMakeMove(r,c);
-                board = adamsUpdateBoard(board);
+                currBoard = adamsMakeMove(currBoard, r,c);
                 
                 //see the score of all possible moves on the board
-                possibleScore[(r*6 + c)] = adamsMinmax(depth, true);
-                board = structuredClone(originalBoard);
+                possibleScore[(r*6 + c)] = adamsMinmax(currBoard, depth, true);
+                
             }
         }
     }
@@ -351,14 +351,12 @@ function adamsClick() {
         let col = maxPosition % 6;
 
         //make a move based on the highest possible score
-        board = structuredClone(originalBoard);
-        player = cpu;
         makeMove(board, row, col);
     }
 }
 
 //minmax function
-function adamsMinmax(depth, maximize) {
+function adamsMinmax(board, depth, maximize) {
     //if depth = 0 then just return the score
     if (depth == 0) {
         return score(board, cpu);
@@ -373,15 +371,10 @@ function adamsMinmax(depth, maximize) {
                     let currBoard = structuredClone(board);
 
                     //test a move
-                    player = cpu;
-                    adamsMakeMove(r,c);
-                    board = adamsUpdateBoard(board);
+                    currBoard = adamsMakeMove(currBoard, cpu, r,c);
 
                     //see the possible value of this move
-                    value = Math.max(value, adamsMinmax(depth-1, false));
-
-                    //reset the board to before the computer made a possible move
-                    board = structuredClone(currBoard);
+                    value = Math.max(value, adamsMinmax(currBoard, depth-1, false));
                 }
             }
         }
@@ -395,15 +388,10 @@ function adamsMinmax(depth, maximize) {
                     let currBoard = structuredClone(board);
 
                     //test a move
-                    player = opposite(cpu);
-                    adamsMakeMove(r,c);
-                    board = adamsUpdateBoard(board);
+                    currBoard = adamsMakeMove(currBoard, opposite(cpu), r,c);
 
                     //see the possible value of this move
-                    value = Math.min(value, adamsMinmax(depth-1, true));
-
-                    //reset the board to before the computer made a possible move
-                    board = structuredClone(currBoard);
+                    value = Math.min(value, adamsMinmax(currBoard, depth-1, true));
 
                 }
             }
@@ -433,16 +421,22 @@ function adamsUpdateBoard(board) {
 
 
 //makes a move without telling the game it is the computers move
-function adamsMakeMove(row, col) {
+function adamsMakeMove(board, p, row, col) {
     // Place the piece
-    board[row][col] = player;
-
+    board[row][col] = p;
     // Capture any pieces
+    let originalPlayer = player
+    player = p;
     for (var drow = -1; drow <= 1; drow++) {
         for (var dcol = -1; dcol <= 1; dcol++) {
             capturePieces(board, row, col, drow, dcol)
         }
     }
+    player = originalPlayer;
+
+    board = adamsUpdateBoard(board);
+
+    return board;
 }
 
 
